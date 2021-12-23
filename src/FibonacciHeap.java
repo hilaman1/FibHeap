@@ -54,7 +54,7 @@ public class FibonacciHeap
             this.tail = nodeToInsert;
             this.minNode = nodeToInsert;
         }else{
-            nodeToInsert = new HeapNode(key, this.head, this.tail);
+            nodeToInsert = new HeapNode(key, this.tail, this.head);
 //            update prev and next of current head and tail
             this.head.setPrev(nodeToInsert);
             this.tail.setNext(nodeToInsert);
@@ -493,6 +493,24 @@ public class FibonacciHeap
         int[] arr = new int[k];
         FibonacciHeap helpHeap = new FibonacciHeap();
         helpHeap.insert(H.findMin().getKey());
+        for(int i = 0; i < k; i++) {
+            arr[i] = helpHeap.minNode.getKey();
+            HeapNode childInd = helpHeap.minNode.getChild();
+            helpHeap.deleteMin();
+//            each node has a lot of children, not just 2 unlike a binary heap
+//            we'll insert the root and iterate over it's children
+//            then find the min node in helpHeap again and repeat
+            if (childInd != null) {
+                HeapNode cur = childInd;
+                helpHeap.insert(childInd.getKey());
+                childInd = childInd.getNext();
+                while (childInd!=cur){
+                    helpHeap.insert(childInd.getKey());
+                    childInd = childInd.getNext();
+                }
+            }
+        }
+        return arr;
     }
 
     /**
@@ -517,11 +535,10 @@ public class FibonacciHeap
             this.key = key;
         }
 
-        public HeapNode(int key, HeapNode head, HeapNode tail) {
+        public HeapNode(int key, HeapNode tail, HeapNode next) {
             this.key=key;
             this.prev=tail;
-            this.next=head;
-            this.parent=null;
+            this.next=next;
         }
 
         public int getKey() {
