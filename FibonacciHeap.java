@@ -16,10 +16,10 @@ public class FibonacciHeap
 
     public FibonacciHeap(){
         // todo-think about constructors
-        this.size=0;
-        this.minNode =null;
-        this.head =null;
-        this.tail =null;
+//        this.size=0;
+//        this.minNode =null;
+//        this.head =null;
+//        this.tail =null;
         // todo-potential is 0 when creating a new FibHeap
 //        markedNodesCnt = 0 and treesCnt = 0, that's what defines the potential so it's 0
     }
@@ -74,38 +74,33 @@ public class FibonacciHeap
      * Deletes the node containing the minimum key.
      *
      */
-    public void deleteMin()
-    {
-        HeapNode minHeapNode=this.minNode;
+    public void deleteMin() {
+        HeapNode minHeapNode = this.minNode;
 
-        if(this.head==this.tail) {
-            if (this.size == 1){
-                // this.min is the root of a single tree in the heap
-                initializeFields();
-            }else {
-                // changes the children of min to be roots of a tree-
-                // by that deleting the original root
-                updateRoots(minHeapNode);//inside update treesCnt is increased for each new tree
-                //maintaing the order of children placement in the heap and by so removing this.min
+        if (minHeapNode != null) {
+            updateRoots(minHeapNode);//inside update treesCnt is increased for each new tree
+            //maintaing the order of children placement in the heap and by so removing this.min
+            if (minNode.getChild() != null) {
                 minHeapNode.getChild().getPrev().setNext(minHeapNode.getNext()); // x_k -> y_3
                 minHeapNode.getNext().setPrev(minHeapNode.getChild().getPrev()); // y_3 -> x_k
                 minHeapNode.getChild().setPrev(minHeapNode.getPrev()); // x_1 -> y_1
                 minHeapNode.getPrev().setNext(minHeapNode.getChild()); // y_1 -> x_1
-                this.treesCnt-=1;
+            } else { //min node has no children
+                //todo-take care of that
+
             }
+
+            if (this.size == 1) {
+                // this.min is the root of a single tree in the heap
+                initializeFields();
+            } else {
+                //temporarly change the minNode pointer to another roots existing in the heap- might change after consolidation
+                this.minNode = minHeapNode.getNext();
+                // successive linking- creates a valid Binomial Heap from FibHeap
+                consolidation();
+            }
+            this.size = this.size - 1;
         }
-        else {
-            //temporarly change the minNode pointer to another roots existing in the heap- might change after consolidation
-            this.minNode=minHeapNode.getNext();
-            // successive linking- creates a valid Binomial Heap from FibHeap
-            consolidation();
-        }
-        // deletion of one heapNode is done so the size need an update
-        this.size=this.size-1;
-
-
-
-        //minNode,rootsNum maintainace is done in consolidation.
     }
 
     private void consolidation() {
@@ -118,15 +113,21 @@ public class FibonacciHeap
         HeapNode currRoot = this.head;
         int rankindex = 0;
         int r=0;
-        currRoot.getPrev().setNext(null);//todo-check it
-        while (currRoot.getNext()!=null){
+        if (rankArray[currRoot.getRank()]==null){
+            rankArray[currRoot.getRank()]=currRoot;
+            print(this,true);
+        }
+        currRoot=currRoot.getNext();
+        //currRoot.getPrev().setNext(null);//todo-check it
+        while (currRoot!=null && currRoot!=this.head){
             //int i=0;
             HeapNode xRoot=currRoot;
-            rankindex=xRoot.getRank();
+            r=xRoot.getRank();
             //i=rankindex;
             // empty box
             if (rankArray[r]==null){ //there is no root with the same rank
                 rankArray[r]=xRoot;
+                print(this,true);
             }
             else { // there is a tree with the same rank as currRoot
                 // we should link them
@@ -135,22 +136,25 @@ public class FibonacciHeap
                     HeapNode sameRankTree=rankArray[r];
                     if (xRoot.getKey()<rankArray[r].getKey()){
                         //currRoot should be the root
-                        newTree= link(currRoot,sameRankTree);
+                        xRoot= link(currRoot,sameRankTree);
+                        print(this,true);
                         rankArray[r]=null; //after linking two trees with rank i ==> currently  no tree in rank i.
                     } else{
                         //sameRankTree-rankArray[i] should be the root
-                        newTree= link(sameRankTree,xRoot);
+                        xRoot= link(sameRankTree,xRoot);
                         rankArray[r]=null; //after linking two trees with rank i ==> currently  no tree in rank i.
                     }
                     r++;
                 }
-                rankArray[r]=newTree;
+                rankArray[r]=xRoot;
             }
             currRoot=currRoot.getNext();
         }
+
         // now we should make sure the roots "list" is ordered by increasing rank
         //so we will collect trees with higher rank first and assign it as the last
-        initializeFields();//including minNode=null;
+
+        initializeFields();//including minNode=null;//todo-check if necessary
         for(int j=0;j<rankArray.length;j++){
             if(rankArray[j]!=null){
                 if (this.isEmpty()&&this.minNode==null){
@@ -187,6 +191,7 @@ public class FibonacciHeap
         this.tail.setNext(this.head);
 
     }
+
 
     private void initializeFields() {
         //sets all fields to their default value
@@ -346,8 +351,17 @@ public class FibonacciHeap
      */
     public int[] countersRep()
     {
-        int[] arr = new int[100];
-        return arr; //	 to be replaced by student code
+        if (this.isEmpty()){
+            return new int[]{};
+        }
+        int[] counterArr = new int[treesCnt];
+        HeapNode currTree=this.head;
+        counterArr[currTree.getRank()]+=1;
+        currTree=currTree.getNext();
+        while(currTree!=this.head){
+            counterArr[currTree.getRank()]+=1;
+        }
+        return counterArr; //	 to be replaced by student code
     }
 
     /**
