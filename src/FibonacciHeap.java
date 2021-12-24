@@ -143,7 +143,7 @@ public class FibonacciHeap
                         this.head = this.minNode.getNext();
                     }
                     if (this.minNode == this.tail) {
-                        this.tail = this.minNode.getNext();
+                        this.tail = this.minNode.getPrev();
                     }
                     this.minNode.getPrev().setNext(this.minNode.getNext());
                     this.minNode.getNext().setPrev(this.minNode.getPrev());
@@ -224,7 +224,7 @@ public class FibonacciHeap
         currRoot.setPrev(null);
         currRoot.setNext(null);
 
-        while (this.head != nextRoot){
+        while (nextRoot != this.head){
             if (rankArray[nextRoot.getRank()] == null) { // no need to link
                 rankArray[nextRoot.getRank()] = nextRoot;
                 currRoot = nextRoot;
@@ -263,25 +263,16 @@ public class FibonacciHeap
         // now we should make sure the roots "list" is ordered by increasing rank
         //so we will collect trees with higher rank first and assign it as the last
 
-        this.head = null;
+//        initializeFields();
         this.tail = null;
+        this.head = null;
         this.minNode = null;
 
         HeapNode pos = null;
 
         for(int i = 0; i <rankArray.length; i++){
             if(rankArray[i] != null){
-                if (this.isEmpty()){
-                    //the heap is empty
-                    HeapNode firstTree=rankArray[i];
-                    firstTree.setNext(firstTree);
-                    firstTree.setPrev(firstTree);
-                    this.tail=firstTree;
-                    this.head =firstTree;
-                    this.minNode=firstTree;
-                    pos = this.head;
-                    //todo-think about a method to initialze new "heap"
-                } else{
+                if (this.head != null) {
                     //roots list isnt empty-we should update pointers
                     // "inserting" currTree into the list of roots.
                     //for each nonempty index theres a tree with its rank so rootsNum
@@ -291,12 +282,23 @@ public class FibonacciHeap
                     rankArray[i].setPrev(pos);
                     this.head.setPrev(rankArray[i]);
                     rankArray[i].setNext(this.head);
-                    this.tail =rankArray[i]; //tail is updated though out the loop
+                    this.tail = rankArray[i]; //tail is updated though out the loop
                     //maintain the minNode
-                    if(rankArray[i].getKey() < this.minNode.getKey()){
-                        this.minNode=rankArray[i];
+                    if (rankArray[i].getKey() < this.minNode.getKey()) {
+                        this.minNode = rankArray[i];
                     }
                     pos = rankArray[i];
+                }
+                if (this.head == null) {
+                    //the heap is empty
+                    this.tail = rankArray[i];
+                    this.minNode = rankArray[i];
+
+                    this.head = rankArray[i];
+                    this.head.setNext(this.head);
+                    this.head.setPrev(this.head);
+                    pos = this.head;
+                    //todo-think about a method to initialze new "heap"
                 }
             }
         }
@@ -323,12 +325,13 @@ public class FibonacciHeap
         //remove heapNode from rootsList
         if (currRoot.getKey() < rootToLink.getKey()){ // currRoot is smaller
             if (currRoot.getRank() > 0){ // currRoot has sons
+                HeapNode currentChild = currRoot.getChild();
                 currRoot.setChild(rootToLink);
                 rootToLink.setParent(currRoot);
-                rootToLink.setNext(currRoot.getChild());
-                rootToLink.setPrev(currRoot.getChild().getPrev());
-                currRoot.getChild().getPrev().setNext(rootToLink);
-                currRoot.getChild().setPrev(rootToLink);
+                rootToLink.setNext(currentChild);
+                rootToLink.setPrev(currentChild.getPrev());
+                currentChild.getPrev().setNext(rootToLink);
+                currentChild.setPrev(rootToLink);
             }else {
                 currRoot.setChild(rootToLink);
                 rootToLink.setParent(currRoot);

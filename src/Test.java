@@ -202,7 +202,6 @@ public class Test {
             }
             fibonacciHeap.deleteMin();
         }
-        System.out.println("hello");
     }
 
     static void test1() {
