@@ -350,8 +350,8 @@ public class FibonacciHeap
                 currRoot.setParent(rootToLink);
                 currRoot.setNext(R2LChild);
                 currRoot.setPrev(R2LChild.getPrev());
-                R2LChild.getPrev().setNext(rootToLink);
-                R2LChild.setPrev(rootToLink);
+                R2LChild.getPrev().setNext(currRoot);
+                R2LChild.setPrev(currRoot);
             }else {
                 rootToLink.setChild(currRoot);
                 currRoot.setParent(rootToLink);
