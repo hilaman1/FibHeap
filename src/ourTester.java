@@ -71,6 +71,9 @@ public class ourTester {
                 return;
             }
             heap.deleteMin();
+//            if (heap.findMin() == 3){
+//                print(fibonacciHeap,true);
+//            }
             fibonacciHeap.deleteMin();
         }
         if (!fibonacciHeap.isEmpty())

@@ -86,59 +86,11 @@ public class FibonacciHeap
      */
     public void deleteMin() {
         if (!this.isEmpty()) {
-            if (this.minNode.getRank() != 0) { // minNode have sons
-                if (this.minNode.getNext() != this.minNode){
-                    if (this.minNode == this.head){
-//                        left child of node to delete is new head
-                        updateChildMark();
-                        this.head = this.minNode.getChild();
-                        this.minNode.getChild().setPrev(tail);
-                        this.tail.setNext(this.minNode.getChild());
-
-                        HeapNode lastChild = findLastChild();
-
-                        this.minNode.getNext().setPrev(lastChild);
-                        lastChild.setNext(this.minNode.getNext());
-                        this.treesCnt = this.treesCnt - 1 + this.minNode.getRank();
-                        consolidation();
-                        this.size --;
-                    }else if (this.minNode == this.tail) {
-                        updateChildMark();
-                        this.minNode.getChild().setPrev(this.minNode.getPrev());
-                        this.minNode.getPrev().setNext(this.minNode.getChild());
-
-                        HeapNode lastChild = findLastChild();
-
-                        this.tail = lastChild;
-                        lastChild.setNext(this.head);
-                        this.head.setPrev(lastChild);
-                        this.treesCnt = this.treesCnt - 1 + this.minNode.getRank();
-                        consolidation();
-                        this.size --;
-                    }
-                }else{ // head = tail
-                    updateChildMark();
-                    this.head = this.minNode.getChild();
-                    this.tail = findLastChild();
-                    this.treesCnt = this.treesCnt - 1 + this.minNode.getRank();
-                    consolidation();
-                    size--;
-                }
-//                updateRoots(minHeapNode);
-//                removeMin(minHeapNode);
-//                if (minHeapNode == minHeapNode.getNext()) {
-//                    this.minNode = null;
-//                } else {
-//                    this.minNode = minHeapNode.getNext();
-//                    consolidation();
-//                }
-//                this.size = this.size - 1;
-            }else{ // minNode doesn't have sons
+            if (this.minNode.getRank() == 0) {
                 if (this.size == 1){ // minNode is alone in heap
                     initializeFields();
 //                  reset Heap
                 }else {
-//                    update head or tail if needed
                     if (this.minNode == this.head) {
                         this.head = this.minNode.getNext();
                     }
@@ -151,10 +103,40 @@ public class FibonacciHeap
                     this.treesCnt--;
                     consolidation();
                 }
+            }else {
+                if (this.minNode.getNext() != this.minNode) {
+                    if (this.minNode == this.head) {
+//                        left child of node to delete is new head
+                        updateChildMark();
+                        this.head = this.minNode.getChild();
+                        this.minNode.getChild().setPrev(tail);
+                        this.tail.setNext(this.minNode.getChild());
+
+                        HeapNode lastChild = findLastChild();
+
+                        this.minNode.getNext().setPrev(lastChild);
+                        lastChild.setNext(this.minNode.getNext());
+                        this.treesCnt = this.treesCnt - 1 + this.minNode.getRank();
+                        consolidation();
+                        this.size--;
+                    } else if (this.minNode == this.tail) {
+                        updateChildMark();
+                        this.minNode.getChild().setPrev(this.minNode.getPrev());
+                        this.minNode.getPrev().setNext(this.minNode.getChild());
+
+                        HeapNode lastChild = findLastChild();
+
+                        this.tail = lastChild;
+                        lastChild.setNext(this.head);
+                        this.head.setPrev(lastChild);
+                        this.treesCnt = this.treesCnt - 1 + this.minNode.getRank();
+                        consolidation();
+                        this.size--;
+                    }
+                }
             }
         }
     }
-
     private HeapNode findLastChild() {
         HeapNode lastChild = this.minNode.getChild();
         HeapNode firstChild = this.minNode.getChild();
