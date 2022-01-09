@@ -123,7 +123,7 @@ public class FibonacciHeap
                 } else {
                     //minNode has at least one Child
                     if (this.minNode == this.head) { //minNode is the head of the root List
-                        HeapNode lastChild = this.minNode.getChild().getPrev(); //todo- what happen when only one child?
+                        HeapNode lastChild = this.minNode.getChild().getPrev();
                         //circular list so last child is th prev to child
                         this.head = this.minNode.getChild();
                         lastChild.setNext(this.minNode.getNext());
